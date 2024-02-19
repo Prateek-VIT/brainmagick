@@ -189,7 +189,7 @@ class BatchScaler:
                 next_loader = None
 
             remaining = self.n_samples_per_recording
-            logger.info(loader)
+            logger.info(loader['_event_lists'])
             for batch in loader:
                 remaining -= len(batch.meg)
                 logger.info(f"Remaining: {remaining} \nBatch: {batch}")
