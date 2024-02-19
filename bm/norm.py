@@ -189,13 +189,17 @@ class BatchScaler:
                 next_loader = None
 
             remaining = self.n_samples_per_recording
+            logger.info(loader)
             for batch in loader:
                 remaining -= len(batch.meg)
+                logger.info(f"Remaining: {remaining} \nBatch: {batch}")
                 recording_index = batch.recording_index[0].item()
                 assert (batch.recording_index == recording_index).all()
+                ### possible memory issue
                 all_meg[recording_index].append(batch.meg)
                 all_features.append(batch.features)
                 all_mask.append(batch.features_mask)
+                ### possible memory issue
                 if remaining <= 0:
                     break
             if next_loader is None:
@@ -219,6 +223,7 @@ class BatchScaler:
         features_mask = _as_nd(torch.cat(all_mask))
         logger.info("features collected for norm: %r", features.shape)
 
+        ### memory spike 1
         for recording_index, recording_meg in all_meg.items():
             meg = _as_nd(torch.cat(recording_meg))
             meg_scaler = RobustScaler(device=self.device)
@@ -226,6 +231,7 @@ class BatchScaler:
             assert recording_index not in self.meg_scalers
             self.meg_scalers[recording_index] = meg_scaler
 
+        ### memory spike 2
         for name, feature_scaler in self.feature_scalers.items():
             slice_ = self.features_builder.get_slice(name)
             feature_data = features[:, slice_]
