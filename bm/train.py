@@ -75,6 +75,8 @@ def get_solver(args: tp.Any, training=True):
     assert n_subjects > 0
     torch.manual_seed(args.seed)
     model_chout = chout
+    logger.debug(f"in_channel dict:{in_channels}")
+    logger.debug(f"out_channel dict:{model_chout}")
     if args.feature_model_name is not None:
         if args.task.type == "decode":
             model_chout = args.feature_model_params.n_out_channels
@@ -82,6 +84,7 @@ def get_solver(args: tp.Any, training=True):
         model = ConvRNN(in_channels=in_channels, out_channels=model_chout,
                         n_subjects=n_subjects, **args.convrnn)
     elif args.model_name == "simpleconv":
+        
         model = SimpleConv(in_channels=in_channels, out_channels=model_chout,
                            n_subjects=n_subjects, **args.simpleconv)
     else:

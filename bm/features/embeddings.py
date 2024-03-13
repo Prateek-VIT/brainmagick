@@ -20,7 +20,7 @@ from . import base
 # pylint: disable=import-outside-toplevel
 
 logger = logging.getLogger(__name__)
-VALID_SPACY_LANG = {'en': 'en_core_web',  # english
+VALID_SPACY_LANG = {'english': 'en_core_web',  # english
                     'da': 'da_core_news',  # danish
                     'nl': 'nl_core_news',  # dutch
                     'fr': 'fr_core_news',  # french

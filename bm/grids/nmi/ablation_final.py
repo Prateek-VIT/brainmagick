@@ -16,7 +16,7 @@ def explorer(launcher):
         partition="learnlab",
     )
     # See conf/model/clip_conv.yaml for the configuration used.
-    launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 256})
+    launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 64})
 
     seeds = [2036, 2037, 2038]
     audio_sets = [
