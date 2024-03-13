@@ -34,7 +34,7 @@ seed: 2038
 dummy:  # use this if you want twice the same exp, with a different name
 cache: ./cache
 features_models: ./features_models
-early_stop_patience: 10  # number of epochs to wait before early stop
+early_stop_patience: 5  # number of epochs to wait before early stop
 eval_every: 1
 eval_train_set: false   # also evaluates on the train set for debugging.
 
@@ -45,7 +45,7 @@ optim:
   lr: 3e-4
   beta2: 0.999
   epochs: 40
-  batch_size: 16
+  batch_size: 64
   loss: l1
   use_weighting: false  # Use weighting for loss on categorical features
   max_batches:          # maximum number of updates per epoch.
