@@ -31,7 +31,7 @@ def explorer(launcher):
             prevxp = main.get_xp(sub[0]._argv)
             for batch in range(batch_size,total_recordings,batch_size):
                 #the continuing model
-                sub.append(launcher.bind({"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True))
+                sub.append(launcher.bind({"dset.selections":[initdset],"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True,seed=initseed))
                 sub[batch//20]()
                 prevxp = main.get_xp(sub[batch//20]._argv)
             
