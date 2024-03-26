@@ -1,4 +1,4 @@
-dora grid batch_train --dry_run --init
+dora grid batchtrain --dry_run --init
 dora run -f fc009d54
 dora run -f df3c2e06
 dora run -f 5cdb73bb
@@ -14,6 +14,6 @@ dora run -f aeb53f3f
 dora run -f 75b7cb9c
 dora run -f c48e4c2c
 dora run -f b45e85a1
-dora grid batch_train
-dora grid batch_train --dry_run
-python -m scripts.run_eval_probs grid_name="batch_train.py"
+dora grid batchtrain
+dora grid batchtrain --dry_run
+python -m scripts.run_eval_probs grid_name="batchtrain.py"
