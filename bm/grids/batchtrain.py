@@ -24,13 +24,14 @@ def explorer(launcher):
     with launcher.job_array():
         exps_var = product(seeds, audio_sets)
         initseed,initdset = next(exps_var)
-        sub = launcher.bind({'dset.selections': [initdset]}, seed=initseed)
+        sub = [launcher.bind({'dset.selections': [initdset]}, seed=initseed)]
         for seed, dset in exps_var:
             #the starting model
-            sub({"dset.n_recordings": batch_size})
-            prevxp = main.get_xp(sub._argv)
+            sub[0]({"dset.n_recordings": batch_size})
+            prevxp = main.get_xp(sub[0]._argv)
             for batch in range(batch_size,total_recordings,batch_size):
                 #the continuing model
-                sub({"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True)
-                prevxp = main.get_xp(sub._argv)
+                sub.append(launcher.bind({"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True))
+                sub[batch//20]()
+                prevxp = main.get_xp(sub[batch//20]._argv)
             
