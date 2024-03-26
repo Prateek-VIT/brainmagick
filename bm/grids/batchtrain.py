@@ -6,15 +6,15 @@
 
 """Ablation grid."""
 from itertools import product  # noqa
-from .._explorers import ClipExplorer
+from ._explorers import ClipExplorer
 from ..train import main  # noqa
 
 @ClipExplorer
 def explorer(launcher):
-    launcher.slurm_(
-        gpus=2, mem_per_gpu=200,
-        partition="learnlab",
-    )
+    # launcher.slurm_(
+    #     gpus=2, mem_per_gpu=200,
+    #     partition="learnlab",
+    # )
     # See conf/model/clip_conv.yaml for the configuration used.
     launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 16})
     total_recordings=300
@@ -22,12 +22,15 @@ def explorer(launcher):
     seeds = [2036, 2037, 2038]
     audio_sets = ['gwilliams2022']
     with launcher.job_array():
-        sub = launcher.bind({'dset.selections': [dset]}, seed=seed)
-        for seed, dset in product(seeds, audio_sets):
+        exps_var = product(seeds, audio_sets)
+        initseed,initdset = next(exps_var)
+        sub = launcher.bind({'dset.selections': [initdset]}, seed=initseed)
+        for seed, dset in exps_var:
             #the starting model
             sub({"dset.n_recordings": batch_size})
+            prevxp = main.get_xp(sub._argv)
             for batch in range(batch_size,total_recordings,batch_size):
                 #the continuing model
-                xp = main.get_xp(sub._argv)
-                sub({"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=xp.sig,continue_best=False)
+                sub({"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True)
+                prevxp = main.get_xp(sub._argv)
             
