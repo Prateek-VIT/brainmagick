@@ -192,7 +192,6 @@ class BatchScaler:
             
             for batch in loader:
                 remaining -= len(batch.meg)
-                logger.info(f"Remaining: {remaining}/{len(batch.meg)} \n")
                 recording_index = batch.recording_index[0].item()
                 assert (batch.recording_index == recording_index).all()
                 ### possible memory issue
