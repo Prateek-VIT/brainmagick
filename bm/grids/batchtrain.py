@@ -16,7 +16,7 @@ def explorer(launcher):
     #     partition="learnlab",
     # )
     # See conf/model/clip_conv.yaml for the configuration used.
-    launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 16,'dset.n_subjects':3})
+    launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 16,'override_n_subjects_model':3})
     total_recordings=196
     batch_size = 20
     seeds = [2036, 2037, 2038]
@@ -24,7 +24,7 @@ def explorer(launcher):
     with launcher.job_array():
         exps_var = product(seeds, audio_sets)
         initseed,initdset = next(exps_var)
-        sub = [launcher.bind({'dset.selections': [initdset]}, seed=initseed)]
+        sub = [launcher.bind({'dset.selections': [initdset], 'override_n_subjects_model':3}, seed=initseed)]
         for seed, dset in exps_var:
             #the starting model
             sub[0]({"dset.n_recordings": batch_size})
