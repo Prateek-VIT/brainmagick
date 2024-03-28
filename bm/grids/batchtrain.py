@@ -17,7 +17,7 @@ def explorer(launcher):
     # )
     # See conf/model/clip_conv.yaml for the configuration used.
     launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 16,'dset.n_subjects':3})
-    total_recordings=300
+    total_recordings=196
     batch_size = 20
     seeds = [2036, 2037, 2038]
     audio_sets = ['gwilliams2022']
