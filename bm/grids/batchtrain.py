@@ -16,7 +16,7 @@ def explorer(launcher):
     #     partition="learnlab",
     # )
     # See conf/model/clip_conv.yaml for the configuration used.
-    launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 16})
+    launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 16,'dset.n_subjects':3})
     total_recordings=196
     batch_size = 20
     seeds = [2036, 2037, 2038]
@@ -31,7 +31,7 @@ def explorer(launcher):
             prevxp = main.get_xp(sub[0]._argv)
             for batch in range(batch_size,total_recordings,batch_size):
                 #the continuing model
-                sub.append(launcher.bind({"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True))
+                sub.append(launcher.bind({"dset.selections":[initdset],"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True,seed=initseed))
                 sub[batch//20]()
                 prevxp = main.get_xp(sub[batch//20]._argv)
             

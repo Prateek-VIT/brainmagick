@@ -1,19 +1,19 @@
-dora grid batch_train --dry_run --init
-dora run -f fc009d54
-dora run -f df3c2e06
-dora run -f 5cdb73bb
-dora run -f 059c9d21
-dora run -f f6b3c37e
-dora run -f 6697239b
-dora run -f c3fc5567
-dora run -f c9b2148b
-dora run -f ee6796ec
-dora run -f e252892d
-dora run -f 6d4ede81
-dora run -f aeb53f3f
-dora run -f 75b7cb9c
-dora run -f c48e4c2c
-dora run -f b45e85a1
-dora grid batch_train
-dora grid batch_train --dry_run
-python -m scripts.run_eval_probs grid_name="batch_train.py"
+dora grid batchtrain --dry_run --init
+dora run -f 9317b135
+dora run -f 94ac7553
+dora run -f 06fc662f
+dora run -f 07072bb8
+dora run -f 99785ab8
+dora run -f 7115b243
+dora run -f d34306cc
+dora run -f 1eae627c
+dora run -f a54072b2
+dora run -f b4078585
+dora run -f d6f92779
+dora run -f de15c0a3
+dora run -f 12b7d486
+dora run -f dc6c8466
+dora run -f 6b0ee0f1
+dora grid batchtrain
+dora grid batchtrain --dry_run
+python -m scripts.run_eval_probs grid_name="batchtrain"
