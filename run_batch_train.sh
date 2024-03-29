@@ -1,14 +1,14 @@
 dora grid batchtrain --dry_run --init
-dora run -f 61d399d0
-dora run -f 0964ffe2
-dora run -f c76b236e
-dora run -f 6c92d4ce
-dora run -f f6647a23
-dora run -f 20005732
-dora run -f b1928e5e
-dora run -f a7535352
-dora run -f 5548e846
-dora run -f 26c87938
+dora run -f 2194deee
+dora run -f 668343eb
+dora run -f 57b81fd7
+dora run -f 389edfaf
+dora run -f f9fec0f6
+dora run -f a0db0dca
+dora run -f 1d6d08bb
+dora run -f 08e62791
+dora run -f 7709ebba
+dora run -f 34a3a03e
 dora grid batchtrain
 dora grid batchtrain --dry_run
 python -m scripts.run_eval_probs grid_name="batchtrain"
