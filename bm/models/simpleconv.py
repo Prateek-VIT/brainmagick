@@ -17,7 +17,8 @@ from pyunicorn.timeseries import RecurrenceNetwork, RecurrencePlot
 
 from .common import (
     ConvSequence, ScaledEmbedding, SubjectLayers,
-    DualPathRNN, ChannelMerger, ChannelDropout, pad_multiple
+    DualPathRNN, ChannelMerger, ChannelDropout, pad_multiple,
+    recurrence_plot
 )
 
 
@@ -76,6 +77,7 @@ class SimpleConv(nn.Module):
                  initial_depth: int = 1,
                  initial_nonlin: bool = False,
                  subsample_meg_channels: int = 0,
+                 recurrence_plot: bool = False,
                  ):
         super().__init__()
         if set(in_channels.keys()) != set(hidden.keys()):
@@ -128,6 +130,18 @@ class SimpleConv(nn.Module):
             dim = {"hidden": hidden["meg"], "input": meg_dim}[subject_layers_dim]
             self.subject_layers = SubjectLayers(meg_dim, dim, n_subjects, subject_layers_id)
             in_channels["meg"] = dim
+
+        #adding the recurrence plot code
+
+        self.recurrence_plot = None
+        if recurrence_plot:
+          self.recurrence_plot = recurrence_plot(in_channels["meg"],
+                                              hidden["meg"],
+                                              in_channels["meg"])
+
+
+
+        #end of my inserted code
 
         self.stft = None
         if n_fft is not None:
@@ -198,6 +212,7 @@ class SimpleConv(nn.Module):
                                        for name, channels in sizes.items()})
 
     def forward(self, inputs, batch):
+        print(f"Init shape: {inputs['meg'].shape}")
         subjects = batch.subject_index
         length = next(iter(inputs.values())).shape[-1]  # length of any of the inputs
 
@@ -205,18 +220,29 @@ class SimpleConv(nn.Module):
             mask = torch.zeros_like(inputs["meg"][:1, :, :1])
             mask[:, self.subsampled_meg_channels] = 1.
             inputs["meg"] = inputs["meg"] * mask
+            print(f"Subsampled shape: {inputs['meg'].shape}")
 
         if self.dropout is not None:
             inputs["meg"] = self.dropout(inputs["meg"], batch)
+            print(f"Dropout shape: {inputs['meg'].shape}")
 
         if self.merger is not None:
-            inputs["meg"] = self.merger(inputs["meg"], batch)
+            inputs["meg"] = self.merger(inputs['meg'], batch)
+            print(f"Merger shape: {inputs['meg'].shape}")
 
         if self.initial_linear is not None:
             inputs["meg"] = self.initial_linear(inputs["meg"])
+            print(f"Initial Linear shape: {inputs['meg'].shape}")
 
         if self.subject_layers is not None:
-            inputs["meg"] = self.subject_layers(inputs["meg"], subjects)
+          inputs["meg"] = self.subject_layers(inputs["meg"], subjects)
+          print(f"Subject shape: {inputs['meg'].shape}")
+
+        if self.recurrence_plot is not None:
+          inputs["meg"] = self.recurrence_plot(inputs["meg"])
+          print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
+
+
 
         if self.stft is not None:
             x = inputs["meg"]
