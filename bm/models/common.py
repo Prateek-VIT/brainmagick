@@ -319,9 +319,9 @@ class recurrence_plot(nn.Module):
     self.conv1 = nn.Sequential(
       nn.Conv2d(in_channels=in_channels,
                 out_channels=hidden_units,
-                kernel_size=3, # how big is the square that's going over the image?
-                stride=1, # default
-                padding=1),# options = "valid" (no padding) or "same" (output has same shape as input) or int for specific number
+                kernel_size=3, 
+                stride=1, 
+                padding=1),
       nn.ReLU(),
       nn.Conv2d(in_channels=hidden_units,
                 out_channels=hidden_units,
@@ -345,6 +345,7 @@ class recurrence_plot(nn.Module):
     )
 
   def forward(self,meg):
+    
   # Fixed recurrence threshold in units of the time series' standard deviation
     EPS_std = 0.1
     # Default distance metric in phase space: "supremum"

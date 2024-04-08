@@ -2,7 +2,7 @@ Init shape: torch.Size([16, 208, 343])
 Merger shape: torch.Size([16, 270, 343])
 Initial Linear shape: torch.Size([16, 270, 343])
 Subject shape: torch.Size([16, 270, 343])
-
+batch_size, meg channels/hidden layer, number of seconds
 
 {
     'concatenate': False, 
@@ -48,3 +48,34 @@ Subject shape: torch.Size([16, 270, 343])
     'hidden': {'meg': 320}
 }
 
+Error executing job with overrides: ['dset.selections=[gwilliams2022]', 'dset.n_recordings=20', 'optim.batch_size=16', 'task.recurrence=True']
+Traceback (most recent call last):
+  File "/home/prateek/Desktop/brainmagick/bm/train.py", line 193, in main
+    return run(args)
+  File "/home/prateek/Desktop/brainmagick/bm/train.py", line 157, in run
+    return solver.train()
+  File "/home/prateek/Desktop/brainmagick/bm/solver.py", line 201, in train
+    self.run_stage('train', self._run_one_epoch, training=True)
+  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/flashy/solver.py", line 199, in run_stage
+    metrics = method(*args, **kwargs)
+  File "/home/prateek/Desktop/brainmagick/bm/solver.py", line 348, in _run_one_epoch
+    estimate, output, features_mask, _ = self._process_batch(batch, training)
+  File "/home/prateek/Desktop/brainmagick/bm/solver.py", line 297, in _process_batch
+    estimate = self.model(inputs, batch)
+  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/prateek/Desktop/brainmagick/bm/models/simpleconv.py", line 242, in forward
+    inputs["meg"] = self.recurrence(inputs["meg"])
+  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/prateek/Desktop/brainmagick/bm/models/common.py", line 353, in forward
+    rp = torch.Tensor(RecurrencePlot(meg, metric=METRIC,
+  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/pyunicorn/timeseries/recurrence_plot.py", line 144, in __init__
+    self.time_series = to_cy(time_series, FIELD)
+  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/pyunicorn/core/_ext/types.py", line 38, in to_cy
+    return arr.astype(dtype=ty, copy=True, order='c', casting='same_kind')
+AttributeError: 'Tensor' object has no attribute 'astype'
