@@ -78,7 +78,7 @@ def get_solver(args: tp.Any, training=True):
     logger.debug(f"in_channel dict:{in_channels}")
     logger.debug(f"out_channel dict:{model_chout}")
     logger.debug(f"The other hidden arguments:")
-    logger.debug(args.simpleconv)d
+    logger.debug(args.simpleconv)
     if args.feature_model_name is not None:
         if args.task.type == "decode":
             model_chout = args.feature_model_params.n_out_channels
