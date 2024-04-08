@@ -77,7 +77,7 @@ class SimpleConv(nn.Module):
                  initial_depth: int = 1,
                  initial_nonlin: bool = False,
                  subsample_meg_channels: int = 0,
-                 recurrence_plot: bool = False,
+                 recurrence: bool = False,
                  ):
         super().__init__()
         if set(in_channels.keys()) != set(hidden.keys()):
@@ -133,9 +133,9 @@ class SimpleConv(nn.Module):
 
         #adding the recurrence plot code
 
-        self.recurrence_plot = None
-        if recurrence_plot:
-          self.recurrence_plot = recurrence_plot(in_channels["meg"],
+        self.recurrence = None
+        if recurrence:
+          self.recurrence = recurrence_plot(in_channels["meg"],
                                               hidden["meg"],
                                               in_channels["meg"])
 
@@ -220,27 +220,27 @@ class SimpleConv(nn.Module):
             mask = torch.zeros_like(inputs["meg"][:1, :, :1])
             mask[:, self.subsampled_meg_channels] = 1.
             inputs["meg"] = inputs["meg"] * mask
-            print(f"Subsampled shape: {inputs['meg'].shape}")
+            #print(f"Subsampled shape: {inputs['meg'].shape}")
 
         if self.dropout is not None:
             inputs["meg"] = self.dropout(inputs["meg"], batch)
-            print(f"Dropout shape: {inputs['meg'].shape}")
+            #print(f"Dropout shape: {inputs['meg'].shape}")
 
         if self.merger is not None:
             inputs["meg"] = self.merger(inputs['meg'], batch)
-            print(f"Merger shape: {inputs['meg'].shape}")
+            #print(f"Merger shape: {inputs['meg'].shape}")
 
         if self.initial_linear is not None:
             inputs["meg"] = self.initial_linear(inputs["meg"])
-            print(f"Initial Linear shape: {inputs['meg'].shape}")
+            #print(f"Initial Linear shape: {inputs['meg'].shape}")
 
         if self.subject_layers is not None:
           inputs["meg"] = self.subject_layers(inputs["meg"], subjects)
-          print(f"Subject shape: {inputs['meg'].shape}")
+          #print(f"Subject shape: {inputs['meg'].shape}")
 
-        if self.recurrence_plot is not None:
-          inputs["meg"] = self.recurrence_plot(inputs["meg"])
-          print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
+        if self.recurrence is not None:
+          inputs["meg"] = self.recurrence(inputs["meg"])
+          #print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
 
 
 

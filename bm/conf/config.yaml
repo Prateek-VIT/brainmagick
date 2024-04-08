@@ -146,6 +146,7 @@ task:
   lowpass_gt: True         # Apply the low pass to ground truth when training.
   lowpass_gt_test: False   # Apply the low pass to ground truth when testing only.
   mask_loss: false         # Apply the stimulus mask to the loss (not for contrastive losses).
+  recurrence: False
 
 # Dora and Hydra config.
 dora:
