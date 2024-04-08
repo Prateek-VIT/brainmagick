@@ -36,4 +36,3 @@ task:
   # causal models with better alignment between brain signals and the presented
   # features.
   offset_meg_ms: 150
-  recurrence: False

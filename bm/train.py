@@ -72,6 +72,8 @@ def get_solver(args: tp.Any, training=True):
     else:
         n_subjects = 1 + max(dset.recording.subject_index for dset in dsets.train.datasets)
 
+    recurrence=args.task.recurrence
+
     assert n_subjects > 0
     torch.manual_seed(args.seed)
     model_chout = chout
@@ -88,7 +90,7 @@ def get_solver(args: tp.Any, training=True):
     elif args.model_name == "simpleconv":
         
         model = SimpleConv(in_channels=in_channels, out_channels=model_chout,
-                           n_subjects=n_subjects, **args.simpleconv)
+                           n_subjects=n_subjects, recurrence=recurrence,**args.simpleconv)
     else:
         raise ValueError(f"Invalid model {args.model}")
     model.to(args.device)
