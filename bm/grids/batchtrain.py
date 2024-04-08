@@ -30,8 +30,12 @@ def explorer(launcher):
             sub[0]({"dset.n_recordings": batch_size})
             prevxp = main.get_xp(sub[0]._argv)
             for batch in range(batch_size,total_recordings,batch_size):
+                #theres some kind of bug or corruption in the 99thor 100th recording that crashes the program
+                if batch == 100:
+                    sub.append(launcher.bind({"dset.selections":[initdset],"dset.n_recordings":19,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True,seed=initseed))
                 #the continuing model
-                sub.append(launcher.bind({"dset.selections":[initdset],"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True,seed=initseed))
+                else:
+                    sub.append(launcher.bind({"dset.selections":[initdset],"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True,seed=initseed))
                 sub[batch//20]()
                 prevxp = main.get_xp(sub[batch//20]._argv)
             
