@@ -12,6 +12,7 @@ import typing as tp
 import mne
 import torch
 from torch import nn
+from pyunicorn.timeseries import RecurrenceNetwork, RecurrencePlot
 
 from ..studies.api import Recording
 

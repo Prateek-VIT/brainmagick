@@ -13,7 +13,7 @@ from torch import nn
 from torch.nn import functional as F
 import torchaudio as ta
 
-from pyunicorn.timeseries import RecurrenceNetwork, RecurrencePlot
+
 
 from .common import (
     ConvSequence, ScaledEmbedding, SubjectLayers,
