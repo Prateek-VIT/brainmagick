@@ -226,6 +226,7 @@ class Recording:
                                f"(subsampled at {sample_rate}Hz) storage.")
         assert filepath is not None
         if not filepath.exists():
+            
             low_mne = preprocess_mne(self.raw(), sample_rate=sample_rate, highpass=highpass)
             low_mne.save(str(filepath), overwrite=True)
             _give_permission(filepath)  # for sharing

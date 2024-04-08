@@ -103,6 +103,7 @@ class Gwilliams2022Recording(api.Recording):
             datatype="meg",
         )
         raw = read_raw_bids(bids_path)  # FIXME this is NOT a lazy read
+        print(bids_path)
         self.raw_sample_rate = raw.info["sfreq"]
         picks = dict(meg=True, eeg=False, stim=False, eog=False, ecg=False, misc=False)
         raw = raw.pick_types(**picks)

@@ -16,7 +16,8 @@ def explorer(launcher):
     #     partition="learnlab",
     # )
     # See conf/model/clip_conv.yaml for the configuration used.
-    launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 16,'dset.n_subjects':3})
+    launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 16,'override_n_subjects_model':4})
+
     total_recordings=196
     batch_size = 20
     seeds = [2036, 2037, 2038]
@@ -24,14 +25,18 @@ def explorer(launcher):
     with launcher.job_array():
         exps_var = product(seeds, audio_sets)
         initseed,initdset = next(exps_var)
-        sub = [launcher.bind({'dset.selections': [initdset]}, seed=initseed)]
+        sub = [launcher.bind({'dset.selections': [initdset], 'override_n_subjects_model':4}, seed=initseed)]
         for seed, dset in exps_var:
             #the starting model
             sub[0]({"dset.n_recordings": batch_size})
             prevxp = main.get_xp(sub[0]._argv)
             for batch in range(batch_size,total_recordings,batch_size):
+                #theres some kind of bug or corruption in the 99thor 100th recording that crashes the program
+                if batch == 100:
+                    sub.append(launcher.bind({"dset.selections":[initdset],"dset.n_recordings":19,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True,seed=initseed))
                 #the continuing model
-                sub.append(launcher.bind({"dset.selections":[initdset],"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True,seed=initseed))
+                else:
+                    sub.append(launcher.bind({"dset.selections":[initdset],"dset.n_recordings":batch_size,"dset.skip_recordings":batch},continue_sig=prevxp.sig,continue_best=True,seed=initseed))
                 sub[batch//20]()
                 prevxp = main.get_xp(sub[batch//20]._argv)
             
