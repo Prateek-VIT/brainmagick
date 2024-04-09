@@ -212,7 +212,7 @@ class SimpleConv(nn.Module):
                                        for name, channels in sizes.items()})
 
     def forward(self, inputs, batch):
-        print(f"\nInit shape: {inputs['meg'].shape}")
+        # print(f"\nInit shape: {inputs['meg'].shape}")
         subjects = batch.subject_index
         length = next(iter(inputs.values())).shape[-1]  # length of any of the inputs
 
@@ -220,27 +220,27 @@ class SimpleConv(nn.Module):
             mask = torch.zeros_like(inputs["meg"][:1, :, :1])
             mask[:, self.subsampled_meg_channels] = 1.
             inputs["meg"] = inputs["meg"] * mask
-            print(f"Subsampled shape: {inputs['meg'].shape}")
+            # print(f"Subsampled shape: {inputs['meg'].shape}")
 
         if self.dropout is not None:
             inputs["meg"] = self.dropout(inputs["meg"], batch)
-            print(f"Dropout shape: {inputs['meg'].shape}")
+            # print(f"Dropout shape: {inputs['meg'].shape}")
 
         if self.merger is not None:
             inputs["meg"] = self.merger(inputs['meg'], batch)
-            print(f"Merger shape: {inputs['meg'].shape}")
+            # print(f"Merger shape: {inputs['meg'].shape}")
 
         if self.initial_linear is not None:
             inputs["meg"] = self.initial_linear(inputs["meg"])
-            print(f"Initial Linear shape: {inputs['meg'].shape}")
+            # print(f"Initial Linear shape: {inputs['meg'].shape}")
 
         if self.subject_layers is not None:
           inputs["meg"] = self.subject_layers(inputs["meg"], subjects)
-          print(f"Subject shape: {inputs['meg'].shape}")
+        #   print(f"Subject shape: {inputs['meg'].shape}")
 
         if self.recurrence is not None:
           inputs["meg"] = self.recurrence(inputs["meg"])
-          print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
+        #   print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
 
 
 
@@ -272,7 +272,7 @@ class SimpleConv(nn.Module):
         if self.dual_path is not None:
             x = self.dual_path(x)
         if self.final is not None:
-            print(f"Final shape : {x.shape}\n")
+            # print(f"Final shape : {x.shape}\n")
             x = self.final(x)
         assert x.shape[-1] >= length
         return x[:, :, :length]
