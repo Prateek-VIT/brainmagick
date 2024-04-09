@@ -147,38 +147,6 @@ Model: SimpleConv(
     'hidden': {'meg': 320}
 }
 
-Error executing job with overrides: ['dset.selections=[gwilliams2022]', 'dset.n_recordings=20', 'optim.batch_size=16', 'task.recurrence=True']
-Traceback (most recent call last):
-  File "/home/prateek/Desktop/brainmagick/bm/train.py", line 193, in main
-    return run(args)
-  File "/home/prateek/Desktop/brainmagick/bm/train.py", line 157, in run
-    return solver.train()
-  File "/home/prateek/Desktop/brainmagick/bm/solver.py", line 201, in train
-    self.run_stage('train', self._run_one_epoch, training=True)
-  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/flashy/solver.py", line 199, in run_stage
-    metrics = method(*args, **kwargs)
-  File "/home/prateek/Desktop/brainmagick/bm/solver.py", line 348, in _run_one_epoch
-    estimate, output, features_mask, _ = self._process_batch(batch, training)
-  File "/home/prateek/Desktop/brainmagick/bm/solver.py", line 297, in _process_batch
-    estimate = self.model(inputs, batch)
-  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/prateek/Desktop/brainmagick/bm/models/simpleconv.py", line 242, in forward
-    inputs["meg"] = self.recurrence(inputs["meg"])
-  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/prateek/Desktop/brainmagick/bm/models/common.py", line 353, in forward
-    rp = torch.Tensor(RecurrencePlot(meg, metric=METRIC,
-  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/pyunicorn/timeseries/recurrence_plot.py", line 144, in __init__
-    self.time_series = to_cy(time_series, FIELD)
-  File "/home/prateek/anaconda3/envs/bm/lib/python3.8/site-packages/pyunicorn/core/_ext/types.py", line 38, in to_cy
-    return arr.astype(dtype=ty, copy=True, order='c', casting='same_kind')
-AttributeError: 'Tensor' object has no attribute 'astype'
-
 Base name:  model=clip_conv dse.selections=['gwilliams2022'] opt.batch_size=16 override_n_subjects_model=4 seed=2036
                                           Meta                                           |   train    |     valid      |     test    
 i  name                                                               sta       sig  sid | ep    loss |   loss    best |   wer  wer_v
@@ -192,3 +160,27 @@ i  name                                                               sta       
 7  continue_sig=d68476db dse.skip_recordings=140                      N/A  45fcc288      |  5  0.3086 | 1.6902  0.8818 | 0.592  0.367
 8  continue_sig=45fcc288 dse.skip_recordings=160                      N/A  874eeff5      |  6  0.2585 | 1.0629  0.8465 | 0.571  0.352
 9  continue_sig=874eeff5 dse.skip_recordings=180                      N/A  2f4c350d      |  6  0.2008 | 0.8106  0.7272 | 0.443  0.265
+
+Compute accuracies
+Top-1 acc: 22.14
+Top-5 acc: 42.11
+Top-10 acc: 51.34
+n_test_samples: 7140
+n_test_vocab: 698
+n_test_segments: 1428
+n_neg_samples: 7140
+n_neg_segments: 1428
+
+Base name:  model=clip_conv dse.selections=['gwilliams2022'] opt.batch_size=16 override_n_subjects_model=27 seed=2036
+                                          Meta                                           |   train   |     valid      |     test    
+i  name                                                               sta       sig  sid | e    loss |   loss    best |   wer  wer_v
+0                                                                     N/A  116083b6      | 8  0.3718 | 1.1922  0.9790 | 0.643  0.396
+1  continue_sig=116083b6 dse.skip_recordings=20                       N/A  51e9e990      | 5  0.3519 | 1.2668  0.7922 | 0.570  0.335
+2  continue_sig=51e9e990 dse.skip_recordings=40                       N/A  483a4762      | 5  0.3381 | 0.8559  0.8124 | 0.631  0.384
+3  continue_sig=483a4762 dse.skip_recordings=60                       N/A  593571ad      | 5  0.3863 | 0.8887  0.7965 | 0.594  0.346
+4  continue_sig=593571ad dse.skip_recordings=80                       N/A  bbdfbabb      | 4  0.3916 | 0.8817  0.7532 | 0.499  0.284
+5  continue_sig=bbdfbabb dse.n_recordings=19 dse.skip_recordings=100  N/A  f02451e3      | 4  0.5416 | 1.5955  1.4068 | 0.776  0.535
+6  continue_sig=f02451e3 dse.skip_recordings=120                      N/A  0d979517      | 6  0.3679 | 0.9861  0.9520 | 0.605  0.358
+7  continue_sig=0d979517 dse.skip_recordings=140                      N/A  ee7cfd8c      | 5  0.3072 | 1.1067  0.9921 | 0.617  0.395
+8  continue_sig=ee7cfd8c dse.skip_recordings=160                      N/A  0ffcb475      | 7  0.2187 | 1.0416  0.8578 | 0.577  0.357
+9  continue_sig=0ffcb475 dse.skip_recordings=180                      N/A  6130bca6      | 7  0.1837 | 0.8707  0.7354 | 0.455  0.286
