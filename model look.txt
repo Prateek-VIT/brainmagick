@@ -2,6 +2,7 @@ Init shape: torch.Size([16, 208, 343])
 Merger shape: torch.Size([16, 270, 343])
 Initial Linear shape: torch.Size([16, 270, 343])
 Subject shape: torch.Size([16, 270, 343])
+Final shape : torch.Size([16, 320, 343])
 batch_size, meg channels/hidden layer, number of seconds
 
 Model: SimpleConv(
