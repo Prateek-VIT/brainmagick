@@ -4,6 +4,104 @@ Initial Linear shape: torch.Size([16, 270, 343])
 Subject shape: torch.Size([16, 270, 343])
 batch_size, meg channels/hidden layer, number of seconds
 
+Model: SimpleConv(
+  (merger): ChannelMerger(
+    (embedding): FourierEmb()
+  )
+  (initial_linear): Sequential(
+    (0): Conv1d(270, 270, kernel_size=(1,), stride=(1,))
+  )
+  (subject_layers): SubjectLayers(270, 270, 27)
+  (final): Sequential(
+    (0): Conv1d(320, 640, kernel_size=(1,), stride=(1,))
+    (1): GELU(approximate='none')
+    (2): ConvTranspose1d(640, 1024, kernel_size=(1,), stride=(1,))
+  )
+  (encoders): ModuleDict(
+    (meg): ConvSequence(
+      (sequence): ModuleList(
+        (0): Sequential(
+          (0): Conv1d(270, 320, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): BatchNorm1d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): GELU(approximate='none')
+        )
+        (1): Sequential(
+          (0): Conv1d(320, 320, kernel_size=(3,), stride=(1,), padding=(2,), dilation=(2,))
+          (1): BatchNorm1d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): GELU(approximate='none')
+        )
+        (2): Sequential(
+          (0): Conv1d(320, 320, kernel_size=(3,), stride=(1,), padding=(4,), dilation=(4,))
+          (1): BatchNorm1d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): GELU(approximate='none')
+        )
+        (3): Sequential(
+          (0): Conv1d(320, 320, kernel_size=(3,), stride=(1,), padding=(8,), dilation=(8,))
+          (1): BatchNorm1d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): GELU(approximate='none')
+        )
+        (4): Sequential(
+          (0): Conv1d(320, 320, kernel_size=(3,), stride=(1,), padding=(16,), dilation=(16,))
+          (1): BatchNorm1d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): GELU(approximate='none')
+        )
+        (5): Sequential(
+          (0): Conv1d(320, 320, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): BatchNorm1d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): GELU(approximate='none')
+        )
+        (6): Sequential(
+          (0): Conv1d(320, 320, kernel_size=(3,), stride=(1,), padding=(2,), dilation=(2,))
+          (1): BatchNorm1d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): GELU(approximate='none')
+        )
+        (7): Sequential(
+          (0): Conv1d(320, 320, kernel_size=(3,), stride=(1,), padding=(4,), dilation=(4,))
+          (1): BatchNorm1d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): GELU(approximate='none')
+        )
+        (8): Sequential(
+          (0): Conv1d(320, 320, kernel_size=(3,), stride=(1,), padding=(8,), dilation=(8,))
+          (1): BatchNorm1d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): GELU(approximate='none')
+        )
+        (9): Sequential(
+          (0): Conv1d(320, 320, kernel_size=(3,), stride=(1,), padding=(16,), dilation=(16,))
+          (1): BatchNorm1d(320, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          (2): GELU(approximate='none')
+        )
+      )
+      (glus): ModuleList(
+        (0): None
+        (1): Sequential(
+          (0): Conv1d(320, 640, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): GLU(dim=1)
+        )
+        (2): None
+        (3): Sequential(
+          (0): Conv1d(320, 640, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): GLU(dim=1)
+        )
+        (4): None
+        (5): Sequential(
+          (0): Conv1d(320, 640, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): GLU(dim=1)
+        )
+        (6): None
+        (7): Sequential(
+          (0): Conv1d(320, 640, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): GLU(dim=1)
+        )
+        (8): None
+        (9): Sequential(
+          (0): Conv1d(320, 640, kernel_size=(3,), stride=(1,), padding=(1,))
+          (1): GLU(dim=1)
+        )
+      )
+    )
+  )
+)
+
 {
     'concatenate': False, 
     'depth': 10, 
