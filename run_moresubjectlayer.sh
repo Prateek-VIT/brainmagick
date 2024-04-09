@@ -11,4 +11,4 @@ dora run -f 0ffcb475
 dora run -f 6130bca6
 dora grid batchtrain
 dora grid batchtrain --dry_run
-python -m scripts.run_eval_probs grid_name="batchtrain"
+python -m scripts.run_eval_probs grid_name="moresubjectlayer"
