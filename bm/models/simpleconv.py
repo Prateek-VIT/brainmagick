@@ -18,7 +18,7 @@ import torchaudio as ta
 from .common import (
     ConvSequence, ScaledEmbedding, SubjectLayers,
     DualPathRNN, ChannelMerger, ChannelDropout, pad_multiple,
-    recurrence_plot
+    recurrence_plot, convert_to_images
 )
 
 
@@ -135,7 +135,7 @@ class SimpleConv(nn.Module):
 
         self.recurrence = None
         if recurrence:
-          self.recurrence = recurrence_plot(in_channels["meg"],
+            self.recurrence = recurrence_plot(in_channels["meg"],
                                               hidden["meg"],
                                               in_channels["meg"])
 
@@ -239,7 +239,8 @@ class SimpleConv(nn.Module):
         #   print(f"Subject shape: {inputs['meg'].shape}")
 
         if self.recurrence is not None:
-          inputs["meg"] = self.recurrence(inputs["meg"])
+            inputs["meg"] = convert_to_images(inputs["meg"])
+            inputs["meg"] = self.recurrence(inputs["meg"])
         #   print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
 
 

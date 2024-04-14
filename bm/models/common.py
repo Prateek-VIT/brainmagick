@@ -311,55 +311,84 @@ class ChannelDropout(nn.Module):
 
 
 class recurrence_plot(nn.Module):
-  def __init__(self,
-               in_channels: int,
-               hidden_units: int,
-               out_channels: int):
-    super().__init__()
-    self.conv1 = nn.Sequential(
-      nn.Conv2d(in_channels=in_channels,
-                out_channels=hidden_units,
-                kernel_size=3, 
-                stride=1, 
-                padding=1),
-      nn.ReLU(),
-      nn.Conv2d(in_channels=hidden_units,
-                out_channels=hidden_units,
-                kernel_size=3,
-                stride=1,
-                padding=1),
-      nn.ReLU(),
-      nn.MaxPool2d(kernel_size=2)
-    )
-    self.conv2 = nn.Sequential(
-        nn.Conv2d(hidden_units, hidden_units, 3, padding=1),
+    def __init__(self, in_channels, hidden_units, out_channels,conv_layers):
+        super().__init__()
+        self.in_channels = in_channels
+        self.hidden_units = hidden_units
+        self.out_channels = out_channels
+
+        # Convolutional layers for image processing
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(in_channels, hidden_units, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(hidden_units, hidden_units, 3, padding=1),
+            nn.Conv2d(hidden_units, hidden_units, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2)
-    )
-    self.feature_extractor = nn.Sequential(
-        nn.Flatten(),
-        nn.Linear(in_features=hidden_units*(in_channels**2)//4 ,
-                      out_features=out_channels)
-    )
+        )
+        self.conv2 = nn.Sequential(
+            nn.Conv2d(hidden_units, hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(hidden_units, hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2)
+        )
 
-  def forward(self,meg):
-    
-  # Fixed recurrence threshold in units of the time series' standard deviation
+        # Feature extractor to reconstruct the output
+        self.feature_extractor = nn.Sequential(
+            nn.Flatten(start_dim=2),
+            nn.LazyLinear(out_channels)
+        )
+
+    def forward(self, x):
+        # Process images through convolutional layers
+        conv_out1 = self.conv1(x)
+        conv_out2 = self.conv2(conv_out1)
+        # Flatten and extract feature
+        features = self.feature_extractor(conv_out2)
+        print(f"flattened shape: {features.shape}")
+        return features
+
+def convert_to_images(input_tensor):
+    """
+    Converts a tensor of shape (16, 270, x) to (16, 270, x, x) where each channel's
+    time series data is transformed into an image of size (x, x).
+
+    Args:
+        input_tensor (torch.Tensor): Input tensor of shape (16, 270, x).
+
+    Returns:
+        torch.Tensor: Output tensor of shape (16, 270, x, x).
+    """
+    batch_size, num_channels, sequence_length = input_tensor.size()
+    # Fixed recurrence threshold in units of the time series' standard deviation
     EPS_std = 0.1
     # Default distance metric in phase space: "supremum"
     # Can also be set to "euclidean" or "manhattan".
     METRIC = "supremum"
-    rp = torch.Tensor(RecurrencePlot(meg, metric=METRIC,
-                        normalize=False, threshold_std=EPS_std))
-    # convert the image into a tensor
-    meg = rp.recurrence_matrix()
+    # Initialize an empty tensor to store the images
+    images = torch.zeros(batch_size, num_channels, sequence_length, sequence_length)
 
-    meg = self.conv1(meg)
-    meg = self.conv2(meg)
-    meg = self.feature_extractor(meg)
-    return meg
+    # Iterate through each batch and its channel
+    for batch in range(batch_size):
+      for channel in range(num_channels):
+          # Get the time series data for the current channel
+          channel_data = input_tensor[batch, channel, :].numpy()  # Convert to numpy array
+          #print(channel_data.shape)
+          # Generate the image using RecurrencePlot function
+          image_np = RecurrencePlot(channel_data, metric=METRIC, normalize=False,
+                                    threshold_std=EPS_std,silence_level=2).recurrence_matrix()
+          #print(image_np.shape)
+          # Convert the numpy array to torch tensor
+          image_tensor = torch.tensor(image_np,dtype=int)
+
+          # Expand the dimensions to match the expected shape
+          image_tensor = image_tensor.unsqueeze(0)
+          image_tensor = image_tensor.unsqueeze(0)
+
+          # Assign the image to the corresponding position in the output tensor
+          images[batch, channel, :, :] = image_tensor
+
+    return images
 
 class ChannelMerger(nn.Module):
     def __init__(self, chout: int, pos_dim: int = 256,
