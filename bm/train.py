@@ -24,6 +24,11 @@ from .solver import Solver
 
 logger = logging.getLogger(__name__)
 
+def force_cudnn_initialization():
+    s = 32
+    dev = torch.device('cuda')
+    torch.nn.functional.conv2d(torch.zeros(s, s, s, s, device=dev), torch.zeros(s, s, s, s, device=dev))
+
 
 def model_hash(model: torch.nn.Module) -> str:
     hasher = sha1()
@@ -153,7 +158,8 @@ def run(args: tp.Any) -> float:
         mb = sum(p.numel() for p in solver.model.parameters()) * 4 / 2**20
         logger.info('Size: %.1f MB', mb)
         return 0.0
-
+    force_cudnn_initialization()
+    
     return solver.train()
 
 
