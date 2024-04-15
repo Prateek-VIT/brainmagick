@@ -311,7 +311,7 @@ class ChannelDropout(nn.Module):
 
 
 class recurrence_plot(nn.Module):
-    def __init__(self, in_channels, hidden_units, out_channels,conv_layers):
+    def __init__(self, in_channels, hidden_units, out_channels):
         super().__init__()
         self.in_channels = in_channels
         self.hidden_units = hidden_units
