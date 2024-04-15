@@ -372,7 +372,7 @@ def convert_to_images(input_tensor):
     for batch in range(batch_size):
       for channel in range(num_channels):
           # Get the time series data for the current channel
-          channel_data = input_tensor[batch, channel, :].numpy()  # Convert to numpy array
+          channel_data = input_tensor.cpu()[batch, channel, :].detach().numpy()  # Convert to numpy array
           #print(channel_data.shape)
           # Generate the image using RecurrencePlot function
           image_np = RecurrencePlot(channel_data, metric=METRIC, normalize=False,
@@ -387,6 +387,7 @@ def convert_to_images(input_tensor):
 
           # Assign the image to the corresponding position in the output tensor
           images[batch, channel, :, :] = image_tensor
+          images = images.cuda()
 
     return images
 

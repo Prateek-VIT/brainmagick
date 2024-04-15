@@ -136,8 +136,8 @@ class SimpleConv(nn.Module):
         self.recurrence = None
         if recurrence:
             self.recurrence = recurrence_plot(in_channels["meg"],
-                                              hidden["meg"],
-                                              in_channels["meg"])
+                                              in_channels["meg"],
+                                              343)
 
 
 
@@ -236,12 +236,12 @@ class SimpleConv(nn.Module):
 
         if self.subject_layers is not None:
           inputs["meg"] = self.subject_layers(inputs["meg"], subjects)
-        #   print(f"Subject shape: {inputs['meg'].shape}")
+          print(f"Subject shape: {inputs['meg'].shape}")
 
         if self.recurrence is not None:
             inputs["meg"] = convert_to_images(inputs["meg"])
+            print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
             inputs["meg"] = self.recurrence(inputs["meg"])
-        #   print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
 
 
 
@@ -273,7 +273,7 @@ class SimpleConv(nn.Module):
         if self.dual_path is not None:
             x = self.dual_path(x)
         if self.final is not None:
-            # print(f"Final shape : {x.shape}\n")
+            print(f"Final shape : {x.shape}\n")
             x = self.final(x)
         assert x.shape[-1] >= length
         return x[:, :, :length]
