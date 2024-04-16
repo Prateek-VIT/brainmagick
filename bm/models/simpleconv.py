@@ -23,6 +23,7 @@ from .common import (
 
 
 class SimpleConv(nn.Module):
+    a = 0
     def __init__(self,
                  # Channels
                  in_channels: tp.Dict[str, int],
@@ -94,7 +95,6 @@ class SimpleConv(nn.Module):
             activation = nn.ReLU
 
         assert kernel_size % 2 == 1, "For padding to work, this must be verified"
-
         self.merger = None
         self.dropout = None
         self.subsampled_meg_channels: tp.Optional[list] = None
@@ -212,7 +212,9 @@ class SimpleConv(nn.Module):
                                        for name, channels in sizes.items()})
 
     def forward(self, inputs, batch):
-        # print(f"\nInit shape: {inputs['meg'].shape}")
+        print(f"Inputs: {self.a}")
+        self.a = self.a +1
+        #print(f"Init shape: {inputs['meg'].shape}")
         subjects = batch.subject_index
         length = next(iter(inputs.values())).shape[-1]  # length of any of the inputs
 
@@ -220,7 +222,7 @@ class SimpleConv(nn.Module):
             mask = torch.zeros_like(inputs["meg"][:1, :, :1])
             mask[:, self.subsampled_meg_channels] = 1.
             inputs["meg"] = inputs["meg"] * mask
-            # print(f"Subsampled shape: {inputs['meg'].shape}")
+            #print(f"Subsampled shape: {inputs['meg'].shape}")
 
         if self.dropout is not None:
             inputs["meg"] = self.dropout(inputs["meg"], batch)
