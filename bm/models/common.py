@@ -382,22 +382,22 @@ class recurrence_plot(nn.Module):
         batch_size, num_channels, sequence_length = x.size()
         # we need to merge the channels into 1 to create the image
         x = x.unsqueeze(1)
-        weighted_average = self.weighted_channel_sum(x)
-        weighted_average.div_(num_channels)
+        x = self.weighted_channel_sum(x)
+        x.div_(num_channels)
         #print(f"unsqueezed shape: {x.shape}")
 
         # call image function
-        weighted_average = weighted_average.view(batch_size,1,sequence_length)
+        x = x.view(batch_size,1,sequence_length)
         #print(f"Squeeze shape: {weighted_average.shape}")
-        image = convert_to_images(weighted_average)
+        x = convert_to_images(x)
 
         # Process images through convolutional layers
-        conv_out1 = self.conv1(image)
-        conv_out2 = self.conv2(conv_out1)
+        x = self.conv1(x)
+        x = self.conv2(x)
         # Flatten and extract feature
-        features = self.feature_extractor(conv_out2)
+        x = self.feature_extractor(x)
         #print(f"flattened shape: {features.shape}")
-        return features
+        return x
 
 class ChannelMerger(nn.Module):
     def __init__(self, chout: int, pos_dim: int = 256,
