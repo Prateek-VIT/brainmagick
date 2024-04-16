@@ -343,7 +343,7 @@ def convert_to_images(input_tensor):
       
       # Assign the image to the corresponding position in the output tensor
       images[batch, 0, :, :] = image_tensor
-      images.cuda()
+      images = images.cuda()
     return images
 
 
