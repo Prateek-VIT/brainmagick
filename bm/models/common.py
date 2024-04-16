@@ -310,6 +310,43 @@ class ChannelDropout(nn.Module):
         return meg
 
 
+def convert_to_images(input_tensor):
+    """
+    Converts a tensor of shape (16, 1, x) into (16,1,x,x)
+    """
+    batch_size, num_channels, sequence_length = input_tensor.size()
+    # Fixed recurrence threshold in units of the time series' standard deviation
+    EPS_std = 0.1
+    # Default distance metric in phase space: "supremum"
+    # Can also be set to "euclidean" or "manhattan".
+    METRIC = "supremum"
+    # Initialize an empty tensor to store the images
+    # images = torch.zeros(batch_size, num_channels, sequence_length)
+    images = torch.zeros(batch_size, num_channels, sequence_length, sequence_length)
+    
+    input_tensor = input_tensor.cpu().detach().numpy()
+    
+    # Iterate through each batch and its channel
+    for batch in range(batch_size):
+      # Get the time series data for the current channel
+      channel_data = input_tensor[batch, 0, :]  # Convert to numpy array
+      
+      # Generate the image using RecurrencePlot function
+      image_np = RecurrencePlot(channel_data, metric=METRIC, normalize=False,
+                                threshold_std=EPS_std, silence_level=2).recurrence_matrix()
+      
+      # Convert the numpy array to torch tensor
+      image_tensor = torch.tensor(image_np, dtype=int)
+      
+      # Expand the dimensions to match the expected shape
+      image_tensor = image_tensor.unsqueeze(0)
+      
+      # Assign the image to the corresponding position in the output tensor
+      images[batch, 0, :, :] = image_tensor
+      images.cuda()
+    return images
+
+
 class recurrence_plot(nn.Module):
     def __init__(self, in_channels, hidden_units, out_channels):
         super().__init__()
@@ -317,9 +354,11 @@ class recurrence_plot(nn.Module):
         self.hidden_units = hidden_units
         self.out_channels = out_channels
 
+        # merge the 208 or however many channels into 1 channel where each is weighted on 
+        self.weighted_channel_sum = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=(in_channels,1),bias=False)
         # Convolutional layers for image processing
         self.conv1 = nn.Sequential(
-            nn.Conv2d(in_channels, hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(1, hidden_units, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             nn.Conv2d(hidden_units, hidden_units, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
@@ -340,66 +379,25 @@ class recurrence_plot(nn.Module):
         )
 
     def forward(self, x):
+        batch_size, num_channels, sequence_length = x.size()
+        # we need to merge the channels into 1 to create the image
+        x = x.unsqueeze(1)
+        weighted_average = self.weighted_channel_sum(x)
+        weighted_average.div_(num_channels)
+        #print(f"unsqueezed shape: {x.shape}")
+
+        # call image function
+        weighted_average = weighted_average.view(batch_size,1,sequence_length)
+        #print(f"Squeeze shape: {weighted_average.shape}")
+        image = convert_to_images(weighted_average)
+
         # Process images through convolutional layers
-        conv_out1 = self.conv1(x)
+        conv_out1 = self.conv1(image)
         conv_out2 = self.conv2(conv_out1)
         # Flatten and extract feature
         features = self.feature_extractor(conv_out2)
         #print(f"flattened shape: {features.shape}")
         return features
-
-def process_single_channel(channel_data):
-  # Fixed recurrence threshold in units of the time series' standard deviation
-  EPS_std = 0.1
-  # Default distance metric in phase space: "supremum"
-  # Can also be set to "euclidean" or "manhattan".
-  METRIC = "supremum"
-  # Generate the image using RecurrencePlot function
-  image_np = RecurrencePlot(channel_data, metric=METRIC, normalize=False,
-                            threshold_std=EPS_std,silence_level=2).recurrence_matrix()
-  #print(image_np.shape)
-  # Convert the numpy array to torch tensor
-  image_tensor = torch.tensor(image_np,dtype=int)
-
-  # Expand the dimensions to match the expected shape
-  image_tensor = image_tensor.unsqueeze(0)
-  image_tensor = image_tensor.unsqueeze(0)
-  return image_tensor
-
-#single process implementation
-def convert_to_images(input_tensor):
-    """
-    Converts a tensor of shape (16, 270, x) to (16, 270, x, x) where each channel's
-    time series data is transformed into an image of size (x, x).
-
-    Args:
-        input_tensor (torch.Tensor): Input tensor of shape (16, 270, x).
-
-    Returns:
-        torch.Tensor: Output tensor of shape (16, 270, x, x).
-    """
-    batch_size, num_channels, sequence_length = input_tensor.size()
-    # Initialize an empty tensor to store the images
-    images = torch.zeros(batch_size, num_channels, sequence_length, sequence_length)
-
-    # Iterate through each batch and its channel
-    # Convert input_tensor to a list of channel_data
-    input_tensor = input_tensor.detach().cpu().numpy()
-    channel_data_list = [input_tensor[batch, channel, :] for batch in range(batch_size) for channel in range(num_channels)]
-
-    
-    # Create a pool of processes
-    with Pool(processes=(cpu_count()-2)) as pool:
-        # Map the process_single_channel function to the list of channel_data in parallel
-        batch_images = pool.map(process_single_channel, channel_data_list)
-  
-    # Reshape the batch_images list back into the original tensor shape
-    for i, image_tensor in enumerate(batch_images):
-        batch = i // num_channels
-        channel = i % num_channels
-        images[batch, channel, :, :] = image_tensor
-    images = images.cuda()
-    return images
 
 class ChannelMerger(nn.Module):
     def __init__(self, chout: int, pos_dim: int = 256,

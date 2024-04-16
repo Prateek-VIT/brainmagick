@@ -241,7 +241,6 @@ class SimpleConv(nn.Module):
           #print(f"Subject shape: {inputs['meg'].shape}")
 
         if self.recurrence is not None:
-            inputs["meg"] = convert_to_images(inputs["meg"])
             #print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
             inputs["meg"] = self.recurrence(inputs["meg"])
 

@@ -1,14 +1,14 @@
 dora grid RecurrenceTrain --dry_run --init
-dora run -f db4df542
-dora run -f 56190304
-dora run -f 6be8d3d9
-dora run -f 448ee274
-dora run -f aff0c439
-dora run -f e35be78d
-dora run -f 4d087a0e
-dora run -f aacd3160
-dora run -f 39b76525
-dora run -f 9b02457b
+dora run -f f555bd4a
+dora run -f ccbe019a
+dora run -f 689bffc4
+dora run -f a5348051
+dora run -f 6b788a08
+dora run -f a918978d
+dora run -f f18ac652
+dora run -f d96ac3cf
+dora run -f 0429f716
+dora run -f c753ef90
 dora grid RecurrenceTrain
 dora grid RecurrenceTrain --dry_run
 python -m scripts.run_eval_probs grid_name="RecurrenceTrain"
