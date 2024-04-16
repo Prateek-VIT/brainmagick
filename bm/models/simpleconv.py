@@ -212,8 +212,8 @@ class SimpleConv(nn.Module):
                                        for name, channels in sizes.items()})
 
     def forward(self, inputs, batch):
-        print(f"Inputs: {self.a}")
-        self.a = self.a +1
+        #print(f"Inputs: {self.a}")
+        #self.a = self.a +1
         #print(f"Init shape: {inputs['meg'].shape}")
         subjects = batch.subject_index
         length = next(iter(inputs.values())).shape[-1]  # length of any of the inputs
