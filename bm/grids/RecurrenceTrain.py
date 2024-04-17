@@ -16,7 +16,7 @@ def explorer(launcher):
     #     partition="learnlab",
     # )
     # See conf/model/clip_conv.yaml for the configuration used.
-    launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 2,'override_n_subjects_model':27, 'task.recurrence':True})
+    launcher.bind_({'model': 'clip_conv', 'optim.batch_size': 16,'override_n_subjects_model':27, 'task.recurrence':True})
 
     total_recordings=196
     batch_size = 20
