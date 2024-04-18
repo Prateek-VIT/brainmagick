@@ -1,4 +1,3 @@
-dora run dset.selections=[gwilliams2022] download_only=true
 dora grid RecurrenceTrain --dry_run --init
 dora run -f cee1ce25 
 dora run -f a95edc12 
