@@ -5,7 +5,7 @@ FROM pytorch/pytorch:latest
 WORKDIR /app
 
 # Install Git
-RUN apt-get update && apt-get install -y git gcc wget
+RUN apt-get update && apt-get install -y git gcc wget sox
 
 # Add the VOLUME mount to the docker file
 RUN git clone https://github.com/Prateek-VIT/brainmagick.git
