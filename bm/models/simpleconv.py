@@ -114,6 +114,15 @@ class SimpleConv(nn.Module):
                 usage_penalty=merger_penalty, n_subjects=n_subjects, per_subject=merger_per_subject)
             in_channels["meg"] = merger_channels
 
+        #adding the recurrence plot code
+
+        self.recurrence = None
+        if recurrence:
+            self.recurrence = recurrence_plot(in_channels["meg"],
+                                              in_channels["meg"],
+                                              343)
+        #end of my inserted code
+        
         if initial_linear:
             init = [nn.Conv1d(in_channels["meg"], initial_linear, 1)]
             for _ in range(initial_depth - 1):
@@ -130,18 +139,6 @@ class SimpleConv(nn.Module):
             dim = {"hidden": hidden["meg"], "input": meg_dim}[subject_layers_dim]
             self.subject_layers = SubjectLayers(meg_dim, dim, n_subjects, subject_layers_id)
             in_channels["meg"] = dim
-
-        #adding the recurrence plot code
-
-        self.recurrence = None
-        if recurrence:
-            self.recurrence = recurrence_plot(in_channels["meg"],
-                                              in_channels["meg"],
-                                              343)
-
-
-
-        #end of my inserted code
 
         self.stft = None
         if n_fft is not None:
@@ -231,7 +228,11 @@ class SimpleConv(nn.Module):
         if self.merger is not None:
             inputs["meg"] = self.merger(inputs['meg'], batch)
             # print(f"Merger shape: {inputs['meg'].shape}")
-
+        
+        if self.recurrence is not None:
+            #print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
+            inputs["meg"] = self.recurrence(inputs["meg"])
+        
         if self.initial_linear is not None:
             inputs["meg"] = self.initial_linear(inputs["meg"])
             # print(f"Initial Linear shape: {inputs['meg'].shape}")
@@ -239,12 +240,6 @@ class SimpleConv(nn.Module):
         if self.subject_layers is not None:
           inputs["meg"] = self.subject_layers(inputs["meg"], subjects)
           #print(f"Subject shape: {inputs['meg'].shape}")
-
-        if self.recurrence is not None:
-            #print(f"Recurrence Plot insertion shape: {inputs['meg'].shape}")
-            inputs["meg"] = self.recurrence(inputs["meg"])
-
-
 
         if self.stft is not None:
             x = inputs["meg"]
