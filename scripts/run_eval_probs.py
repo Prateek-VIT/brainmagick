@@ -441,7 +441,7 @@ if __name__ == "__main__":
         grid_name=None,
         exclude_sigs=None,
         n_negatives=20000,
-        load_batch_size=100,
+        load_batch_size=16,
         probs_batch_size=1000,
         distributed=False,
         n_recordings=None,
