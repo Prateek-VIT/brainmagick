@@ -1,3 +1,42 @@
+This is a fork of the brainmagick repository from the facebookresearchgroup. This has an implementation of recurrence plots in it.
+Additionally, there were many missing imports and more additional requirements that were not mentioned, I have created a docker file for. You can build it or get it from the dockerhub repository, it is publically available.
+
+the commands to run the required environment is
+
+Note you dont need to clone the repository, simply using these commands should clone the repository for you in the brainmagick folder.
+```shell
+docker pull prateekkarn2020943/brainmagick:latest
+mkdir ./brainmagick
+docker volume create brainmagick_data --driver local --opt device=[PATH TO FOLDER] --opt o=bind --opt type=none
+docker run --gpus all -it -v brainmagick_data:/app/brainmagick brainmagick
+```
+
+You should see a docker container with a shell. Ensure the conda environment is active and the directory is correct.
+```shell
+cd /app/brainmagick
+conda activate bm
+```
+
+With this you have the ability to train using the following commands
+```shell
+dora grid nmi.main_table --dry_run --init
+dora run -f [SIG]
+```
+we are using the signatures shown from the grid command.
+Due to a bug https://github.com/facebookresearch/brainmagick/issues/4#issuecomment-1938093970
+run it without the --dry_run flag once to get an error and it will internally forcefully push the signatures back into 
+```shell
+dora grid nmi.main_table
+```
+it will give an error and you can ignore that. You can continue to use the evaluation script.
+
+an example of the sequence of how to input the instructions is stored in the shell files that start with run_xxx.sh
+```shell
+bash runmoresubjectlayer.sh #to run the experiment for more subject layers
+```
+
+The other instructions are down below
+
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/facebookresearch/brainmagick/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/facebookresearch/brainmagick/tree/main)
 
 # Decoding speech from non-invasive recordings of brain activity
