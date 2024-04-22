@@ -1,16 +1,14 @@
 This is a fork of the brainmagick repository from the facebookresearchgroup. This has an implementation of recurrence plots in it.
 Additionally, there were many missing imports and more additional requirements that were not mentioned, I have created a docker file for. You can build it or get it from the dockerhub repository, it is publically available.
 
-the commands to run the required environment is
-
-Note you dont need to clone the repository, simply using these commands should clone the repository for you in the brainmagick folder.
+Note you dont need to clone the girhub repository (unless you want to locally build the dockerfile), simply using these commands should clone the repository for you in the brainmagick folder.
 ```shell
 docker pull prateekkarn2020943/brainmagick:latest
 mkdir ./brainmagick
 docker volume create brainmagick_data --driver local --opt device=[PATH TO FOLDER] --opt o=bind --opt type=none
 docker run --gpus all -it -v brainmagick_data:/app/brainmagick brainmagick
 ```
-
+the [PATH TO FOLDER] is where you performed mkdir ./brainmagick, input the path to that folder `/home/xxx/desktop/brainmagick` or whatever
 You should see a docker container with a shell. Ensure the conda environment is active and the directory is correct.
 ```shell
 cd /app/brainmagick
