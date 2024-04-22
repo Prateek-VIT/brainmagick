@@ -8,10 +8,11 @@ from functools import partial
 import logging
 import math
 import typing as tp
-
+from multiprocessing import Pool,cpu_count
 import mne
 import torch
 from torch import nn
+from pyunicorn.timeseries import RecurrenceNetwork, RecurrencePlot
 
 from ..studies.api import Recording
 
@@ -308,6 +309,95 @@ class ChannelDropout(nn.Module):
 
         return meg
 
+
+def convert_to_images(input_tensor):
+    """
+    Converts a tensor of shape (16, 1, x) into (16,1,x,x)
+    """
+    batch_size, num_channels, sequence_length = input_tensor.size()
+    # Fixed recurrence threshold in units of the time series' standard deviation
+    EPS_std = 0.1
+    # Default distance metric in phase space: "supremum"
+    # Can also be set to "euclidean" or "manhattan".
+    METRIC = "supremum"
+    # Initialize an empty tensor to store the images
+    # images = torch.zeros(batch_size, num_channels, sequence_length)
+    images = torch.zeros(batch_size, num_channels, sequence_length, sequence_length)
+    
+    input_tensor = input_tensor.cpu().detach().numpy()
+    
+    # Iterate through each batch and its channel
+    for batch in range(batch_size):
+      # Get the time series data for the current channel
+      channel_data = input_tensor[batch, 0, :]  # Convert to numpy array
+      
+      # Generate the image using RecurrencePlot function
+      image_np = RecurrencePlot(channel_data, metric=METRIC, normalize=False,
+                                threshold_std=EPS_std, silence_level=2).recurrence_matrix()
+      
+      # Convert the numpy array to torch tensor
+      image_tensor = torch.tensor(image_np, dtype=int)
+      
+      # Expand the dimensions to match the expected shape
+      image_tensor = image_tensor.unsqueeze(0)
+      
+      # Assign the image to the corresponding position in the output tensor
+      images[batch, 0, :, :] = image_tensor
+      images = images.cuda()
+    return images
+
+
+class recurrence_plot(nn.Module):
+    def __init__(self, in_channels, hidden_units, out_channels):
+        super().__init__()
+        self.in_channels = in_channels
+        self.hidden_units = hidden_units
+        self.out_channels = out_channels
+
+        # merge the 208 or however many channels into 1 channel where each is weighted on 
+        self.weighted_channel_sum = nn.Conv2d(in_channels=1,out_channels=1,kernel_size=(in_channels,1),bias=False)
+        # Convolutional layers for image processing
+        self.conv1 = nn.Sequential(
+            nn.Conv2d(1, hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(hidden_units, hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2)
+        )
+        self.conv2 = nn.Sequential(
+            nn.Conv2d(hidden_units, hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(hidden_units, hidden_units, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2)
+        )
+
+        # Feature extractor to reconstruct the output
+        self.feature_extractor = nn.Sequential(
+            nn.Flatten(start_dim=2),
+            nn.LazyLinear(out_channels)
+        )
+
+    def forward(self, x):
+        batch_size, num_channels, sequence_length = x.size()
+        # we need to merge the channels into 1 to create the image
+        x = x.unsqueeze(1)
+        x = self.weighted_channel_sum(x)
+        x.div_(num_channels)
+        #print(f"unsqueezed shape: {x.shape}")
+
+        # call image function
+        x = x.view(batch_size,1,sequence_length)
+        #print(f"Squeeze shape: {weighted_average.shape}")
+        x = convert_to_images(x)
+
+        # Process images through convolutional layers
+        x = self.conv1(x)
+        x = self.conv2(x)
+        # Flatten and extract feature
+        x = self.feature_extractor(x)
+        #print(f"flattened shape: {features.shape}")
+        return x
 
 class ChannelMerger(nn.Module):
     def __init__(self, chout: int, pos_dim: int = 256,
