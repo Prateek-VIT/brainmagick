@@ -6,7 +6,7 @@ Note you dont need to clone the girhub repository (unless you want to locally bu
 docker pull prateekkarn2020943/brainmagick:latest
 mkdir ./brainmagick
 docker volume create brainmagick_data --driver local --opt device=[PATH TO FOLDER] --opt o=bind --opt type=none
-docker run --gpus all -it -v brainmagick_data:/app/brainmagick brainmagick
+docker run --gpus all -it -v brainmagick_data:/app/brainmagick prateekkarn2020943/brainmagick:latest
 ```
 the [PATH TO FOLDER] is where you performed mkdir ./brainmagick, input the path to that folder `/home/xxx/desktop/brainmagick` or whatever
 You should see a docker container with a shell. Ensure the conda environment is active and the directory is correct.
