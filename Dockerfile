@@ -23,7 +23,7 @@ RUN rm -rf ~/miniconda3/miniconda.sh
 
 # Create a new conda environment and install required dependencies
 RUN conda create -n bm ipython python=3.8 -y
-RUN echo "source activate bm" > ~/.bashrc
+RUN echo "conda activate bm" > ~/.bashrc
 ENV PATH /opt/conda/envs/env/bin:$PATH
 
 # Install requirements
